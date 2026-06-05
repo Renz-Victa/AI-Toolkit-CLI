@@ -82,13 +82,19 @@ class ModelConfig:
   hidden_size: int = 768
   num_layers: int = 12
   dropout: float = 0.1
-  vocab_size: int = 50000
+  vocab_size: int = 20000
+  model_name: str
+  max_tokens: int
+  temperature: float
 
 config = ModelConfig(
-  hidden_size=768
-  num_layers=12
-  dropout=0.1
-  vocab_size=50000
+  hidden_size=128,
+  num_layers=12,
+  dropout=0.1,
+  vocab_size=50000,
+  model_name="gpt-model",
+  max_tokens=1000,
+  temperature=0.5
 )
 
 model = ModelConfig(config)
