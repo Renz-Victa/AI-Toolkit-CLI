@@ -69,8 +69,8 @@ class TrainingConfig:
   epochs: int = 10
 
 config = TrainingConfig(
-  learning_rate=0.001
-  batch_size=32
+  learning_rate=0.001,
+  batch_size=32,
   epochs=10
 )
 
@@ -102,7 +102,7 @@ model = ModelConfig(config)
 @dataclass
 class Message: 
   role: str
-  content: str
+  content: str = ""
   timestamp: str
 
 message1 = Message(
@@ -111,6 +111,6 @@ message1 = Message(
 )
 
 message2 = Message(
-  role="assistant"
+  role="assistant",
   content="This is an AI Toolkit CLI"
 )
