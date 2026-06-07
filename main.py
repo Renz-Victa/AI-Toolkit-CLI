@@ -114,3 +114,30 @@ message2 = Message(
   role="assistant",
   content="This is an AI Toolkit CLI"
 )
+
+# ---------------------
+# Dictionary, List, and String Syntax
+# ---------------------
+
+model_config = {
+  "model": "gpt-3.5",
+  "temperature": "0.5",
+  "max_tokens": 900
+}
+
+models = [
+  "gpt-3.5", 
+  "gpt-4o"
+]
+
+tools = [
+  "websearch",
+  "calculator",
+  "file-reader",
+  "code_executor"
+]
+
+model = "gpt-3.5"
+tokens_used = 100
+
+status = f"model {model} has used {tokens_used} tokens so far"
