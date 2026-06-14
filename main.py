@@ -166,4 +166,4 @@ spam_probability = 0.70
 if spam_probability >= 0.70:
   print("This email is spam")
 else: 
-  "This email is not spam"
+  ("This email is not spam")
