@@ -167,3 +167,29 @@ if spam_probability >= 0.70:
   print("This email is spam")
 else: 
   ("This email is not spam")
+
+# ---------------------
+# 6. Loops
+# ---------------------
+
+while True: 
+  message = input("You need: ")
+
+  if message.lower() == "exit":
+    print("Bot: Goodbye!")
+    break
+
+  print("Bot: I received:", message)
+
+# ---------------------
+# 7. Set Comprehensions
+# ---------------------
+
+tools = [
+  {"tool": "load prompts from files"},
+  {"tool": "Run through an LLM Model"},
+  {"tool": "Save responses automatically"},
+  {"tool": "Keep History"}
+]
+
+unique_tools = {p["tool"] for t in tools}
