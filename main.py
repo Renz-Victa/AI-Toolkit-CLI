@@ -156,3 +156,14 @@ features: list[str, float]
 user_prompt: str = int("Enter your question: ")
 response = f"AI Response to: {user_prompt}"
 print(response)
+
+# ---------------------
+# 5. Conditionals
+# ---------------------
+
+spam_probability = 0.70
+
+if spam_probability >= 0.70:
+  print("This email is spam")
+else: 
+  "This email is not spam"
