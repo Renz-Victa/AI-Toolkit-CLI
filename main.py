@@ -1,6 +1,7 @@
 import argparse
 import sys
 from dataclasses import dataclass
+from typing import List
 
 parser = argparse.ArgumentParser(description="A script with a optional flags")
 
@@ -141,3 +142,17 @@ model = "gpt-3.5"
 tokens_used = 100
 
 status = f"model {model} has used {tokens_used} tokens so far"
+
+# ---------------------
+# 2. Type Hints
+# ---------------------
+
+features: list[str, float]
+
+# ---------------------
+# 4. Input from user
+# ---------------------
+
+user_prompt: str = int("Enter your question: ")
+response = f"AI Response to: {user_prompt}"
+print(response)
