@@ -193,3 +193,15 @@ tools = [
 ]
 
 unique_tools = {p["tool"] for t in tools}
+
+# ---------------------
+# 9. *args and **kwargs
+# ---------------------
+
+class LLM_Model:
+  def __init__(self, *layers, **config()):
+    self.layers = layers
+    self.lr = config.get("lr", 0.001)
+    self.activation = config.get("activation", "relu")
+
+model = LLM_Model(64, 128, 10, lr=0.001, activation="tanh")
