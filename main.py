@@ -3,6 +3,7 @@ import sys
 from dataclasses import dataclass
 from typing import List
 import json
+from pathlib import Path
 
 parser = argparse.ArgumentParser(description="A script with a optional flags")
 
@@ -280,3 +281,22 @@ with open("response.txt", w) as f:
 
 with open("log.txt", "a") as f:
   f.write("Model run completed\n")
+
+# ---------------------
+# 15. Path Handling
+# ---------------------
+
+data_path = Path("data") / "train.csv"
+
+prompt_path = Path("prompts") / "system_prompt.txt"
+
+with prompt_path.open("r") as f:
+  prompt = f.read()
+
+output_dir = Path("outputs")
+output_dir.mkdir(exist_ok=True)
+
+output_file = output_dir / "response.txt"
+
+with output_file.open("w") as f:
+  f.write("Generated answer from this model.")
