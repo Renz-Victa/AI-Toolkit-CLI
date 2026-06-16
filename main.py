@@ -2,6 +2,7 @@ import argparse
 import sys
 from dataclasses import dataclass
 from typing import List
+import json
 
 parser = argparse.ArgumentParser(description="A script with a optional flags")
 
@@ -205,3 +206,62 @@ class LLM_Model:
     self.activation = config.get("activation", "relu")
 
 model = LLM_Model(64, 128, 10, lr=0.001, activation="tanh")
+
+# ---------------------
+# 11. Exception Handling
+# ---------------------
+
+try:
+  response = client.responses.create(
+    model="gpt-3.5"
+    )
+  
+except Exception as e:
+  print(f"LLM API failed: {e}")
+
+try: 
+  data = json.loads(output)
+except json.JSONDecodeError:
+  print("Invalid JSON from model")
+
+try:
+  file = open("data.txt")
+  data = file.read()
+
+except FileNotFoundError:
+  print("File not found")
+
+finally:
+  print("Cleanup complete")
+
+try:
+  retrieve_documents()
+except RetrievalError as e:
+  print(e)
+
+try: 
+  process_data()
+except FileNotFoundError:
+  print("File missing")
+except ValueError:
+  print("Invalid data")
+except Exception as e:
+  print(f"Unexpected error: {e}")
+
+try: 
+  docs = vector_db.search(query)
+
+  response = llm.generate(
+    query=query,
+    context=docs
+  )
+
+except ConnectionError:
+  response = "Knowledge base unavailable"
+
+except TimeoutError:
+  response = "Request timed out. Please try again."
+
+except Exception as e:
+  logger.error(f"Unexpected error: {e}")
+  response = "Something went wrong."
