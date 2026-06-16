@@ -265,3 +265,18 @@ except TimeoutError:
 except Exception as e:
   logger.error(f"Unexpected error: {e}")
   response = "Something went wrong."
+
+# ---------------------
+# 14. File Reading and Writing
+# ---------------------
+
+with open("prompt.txt", "r") as f:
+  prompt = f.read()
+
+response = "This is a generated answer."
+
+with open("response.txt", w) as f:
+  f.write(response)
+
+with open("log.txt", "a") as f:
+  f.write("Model run completed\n")
