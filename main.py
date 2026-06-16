@@ -305,3 +305,10 @@ with output_file.open("w") as f:
 # ---------------------
 # 16. JSON
 # ---------------------
+
+{
+  "model": "gpt-3.5",
+  "task": "Research Hubspot",
+  "priority": "medium",
+  "output_format": "summary"
+}
