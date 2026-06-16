@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List
 import json
 from pathlib import Path
-import Optional
+from typing import Optional
 
 parser = argparse.ArgumentParser(description="A script with a optional flags")
 
@@ -79,7 +79,7 @@ config = TrainingConfig(
 )
 
 print(config.learning_rate)
-print(config.bath_size)
+print(config.batch_size)
 
 @dataclass
 class ModelConfig:
@@ -129,11 +129,6 @@ model_config = {
   "max_tokens": 900
 }
 
-models = [
-  "gpt-3.5", 
-  "gpt-4o"
-]
-
 tools = [
   "websearch",
   "calculator",
@@ -156,7 +151,7 @@ features: list[str, float]
 # 4. Input from user
 # ---------------------
 
-user_prompt: str = int("Enter your question: ")
+user_prompt: str = input("Enter your question: ")
 response = f"AI Response to: {user_prompt}"
 print(response)
 
@@ -195,14 +190,14 @@ tools = [
   {"tool": "Keep History"}
 ]
 
-unique_tools = {p["tool"] for t in tools}
+unique_tools = {t["tool"] for t in tools}
 
 # ---------------------
 # 9. *args and **kwargs
 # ---------------------
 
 class LLM_Model:
-  def __init__(self, *layers, **config()):
+  def __init__(self, *layers, **config):
     self.layers = layers
     self.lr = config.get("lr", 0.001)
     self.activation = config.get("activation", "relu")
@@ -213,8 +208,10 @@ model = LLM_Model(64, 128, 10, lr=0.001, activation="tanh")
 # 11. Exception Handling
 # ---------------------
 
+
+
 try:
-  response = client.responses.create(
+  response = model_config.responses.create(
     model="gpt-3.5"
     )
   
@@ -250,10 +247,12 @@ except ValueError:
 except Exception as e:
   print(f"Unexpected error: {e}")
 
+vector_db = []
+
 try: 
   docs = vector_db.search(query)
 
-  response = llm.generate(
+  response = model.generate(
     query=query,
     context=docs
   )
@@ -277,7 +276,7 @@ with open("prompt.txt", "r") as f:
 
 response = "This is a generated answer."
 
-with open("response.txt", w) as f:
+with open("response.txt", "w") as f:
   f.write(response)
 
 with open("log.txt", "a") as f:
