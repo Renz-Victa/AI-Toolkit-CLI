@@ -4,10 +4,11 @@ from dataclasses import dataclass
 from typing import List
 import json
 from pathlib import Path
+import Optional
 
 parser = argparse.ArgumentParser(description="A script with a optional flags")
 
-parser.add_argument("v", "--verbose", action="store_true", help="Turn on verbose logging")
+parser.add_argument("-v", "--verbose", action="store_true", help="Turn on verbose logging")
 parser.add_argument("-o", "--output", type=str, default="log.txt", help="Output file path")
 
 args = parser.parse_args()
@@ -15,15 +16,15 @@ args = parser.parse_args()
 if args.verbose:
   print(f"Verbose mode active. Saving results to: {args.output}")
 
-flag_active = "--flga" in sys.argy or "-f" in sys.argv
+flag_active = "--flag" in sys.argv or "-f" in sys.argv
 print("Flag is on!" if flag_active else "Flag is off.")
 
-def greet(name: Optional[int]) -> str: 
+def greet(name: Optional[str]) -> str: 
   if name is None:
     return "Hello, Guest"
   return f"Hello, {name}"
 
-def train_model(data, model, *, epochs, learning_rate):
+def train_model(data, *, epochs, learning_rate):
   print(f"Training {model} for {epochs} epochs with lr={learning_rate}")
 
 train_model("dataset.csv", epochs=10, learning_rate=0.001)
@@ -32,7 +33,7 @@ def build_optimizer(model, *, lr=0.001, weight_decay=0.0, beta1=0.9):
   print("Optimizer configured")
 
 class Dataset:
-  def __init(self, data):
+  def __init__(self, data):
     self.data = data  
 
   def predict(self, x):
@@ -300,3 +301,7 @@ output_file = output_dir / "response.txt"
 
 with output_file.open("w") as f:
   f.write("Generated answer from this model.")
+
+# ---------------------
+# 16. JSON
+# ---------------------
