@@ -24,7 +24,7 @@ def greet(name: Optional[str]) -> str:
     return "Hello, Guest"
   return f"Hello, {name}"
 
-def train_model(data, *, epochs, learning_rate):
+def train_model(data, model, *, epochs, learning_rate):
   print(f"Training {model} for {epochs} epochs with lr={learning_rate}")
 
 train_model("dataset.csv", epochs=10, learning_rate=0.001)
@@ -83,13 +83,13 @@ print(config.batch_size)
 
 @dataclass
 class ModelConfig:
+  model_name: str
+  max_tokens: int
+  temperature: float
   hidden_size: int = 768
   num_layers: int = 12
   dropout: float = 0.1
   vocab_size: int = 20000
-  model_name: str
-  max_tokens: int
-  temperature: float
 
 config = ModelConfig(
   hidden_size=128,
@@ -101,20 +101,20 @@ config = ModelConfig(
   temperature=0.5
 )
 
-model = ModelConfig(config)
-
 @dataclass
 class Message: 
   role: str
-  content: str = ""
   timestamp: str
+  content: str = ""
 
 message1 = Message(
+  timestamp="This happened at 2026-06-17, 14:32:10",
   role="user", 
   content="What is this model?"
 )
 
 message2 = Message(
+  timestamp="This happened at 2026-06-18, 15:43:21",
   role="assistant",
   content="This is an AI Toolkit CLI"
 )
@@ -130,10 +130,10 @@ model_config = {
 }
 
 tools = [
-  "websearch",
-  "calculator",
-  "file-reader",
-  "code_executor"
+  {"tool": "load prompts from files"},
+  {"tool": "Run through an LLM Model"},
+  {"tool": "Save responses automatically"},
+  {"tool": "Keep History"}
 ]
 
 model = "gpt-3.5"
@@ -182,13 +182,6 @@ while True:
 # ---------------------
 # 7. Set Comprehensions
 # ---------------------
-
-tools = [
-  {"tool": "load prompts from files"},
-  {"tool": "Run through an LLM Model"},
-  {"tool": "Save responses automatically"},
-  {"tool": "Keep History"}
-]
 
 unique_tools = {t["tool"] for t in tools}
 
@@ -309,4 +302,11 @@ with output_file.open("w") as f:
   "task": "Research Hubspot",
   "priority": "medium",
   "output_format": "summary"
+}
+
+{
+  "prompt": "...",
+  "model": "gpt-3.5",
+  "response": "...",
+  "timestamp": "2026-06-14"
 }
