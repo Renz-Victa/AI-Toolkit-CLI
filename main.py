@@ -5,8 +5,12 @@ from typing import List
 import json
 from pathlib import Path
 from typing import Optional
+from dotenv import load_dotenv
+import os
 
-parser = argparse.ArgumentParser(description="A script with a optional flags")
+client = os.dotenv("OPENAI_API_KEY")
+
+parser = argparse.ArgumentParser(description="prompt")
 
 parser.add_argument("-v", "--verbose", action="store_true", help="Turn on verbose logging")
 parser.add_argument("-o", "--output", type=str, default="research.txt", help="Output file path")
@@ -151,9 +155,10 @@ features: list[str, float]
 # 4. Input from user
 # ---------------------
 
-user_prompt: str = input("Enter your question: ")
-response = f"AI Response to: {user_prompt}"
-print(response)
+def user_prompt(client, model):
+  user_prompt = input("Enter your question: ")
+  response = f"AI Response to: {user_prompt}"
+  print(response)
 
 # ---------------------
 # 5. Conditionals
@@ -201,78 +206,59 @@ model = LLM_Model(64, 128, 10, lr=0.001, activation="tanh")
 # 11. Exception Handling
 # ---------------------
 
-try:
-  response = model_config.responses.create(
-    model="gpt-3.5"
+def api(client):
+  try:
+    response = client.responses.create(
+      model="gpt-3.5"
     )
   
-except Exception as e:
-  print(f"LLM API failed: {e}")
-
-try: 
-  data = json.loads(tools)
-except json.JSONDecodeError:
-  print("Invalid JSON from model")
-
-try:
-  file = open("research.txt")
-  data = file.read()
-
-except FileNotFoundError:
-  print("File not found")
-
-finally:
-  print("Cleanup complete")
+  except Exception as e:
+    print(f"LLM API failed: {e}")
+  except ConnectionError:
+    print("Failed to connect to the API.")
 
 class RetrievalError(Exception):
-  pass
+  def retrieve_documents():
+    try: 
+      file = open("summarise.txt")
+      data = file.retrieve_documents()
+    except FileNotFoundError:
+      print("File missing")
+    except ValueError:
+      print("Invalid data")
+    except Exception as e:
+      print(f"Unexpected error: {e}")
+    except RetrievalError as e:
+      print(str(e))
+    except TimeoutError:
+      print("Request time out. Please try again later.")
+    finally:
+      print("Finished!")
+    return data
 
-def retrieve_documents():
-  raise RetrievalError("Failed to retrieve documents")
+def read_file(client):
+  try:
+    file = open("summarise.txt")
+    data = file.read()
 
-try: 
-  retrieve_documents()
-except FileNotFoundError:
-  print("File missing")
-except ValueError:
-  print("Invalid data")
-except Exception as e:
-  print(f"Unexpected error: {e}")
-except RetrievalError as e:
-  print(e)
-finally:
-  print("Finished!")
-
-vector_db = []
-
-try: 
-  docs = vector_db.search(message1)
-
-  response = model.generate(
-    query=message1,
-    context=docs
-  )
-
-except ConnectionError:
-  response = "Knowledge base unavailable"
-
-except TimeoutError:
-  response = "Request timed out. Please try again."
+  except FileNotFoundError:
+    print("File not found")
+    return data
 
 # ---------------------
 # 14. File Reading and Writing
 # ---------------------
 
-with open("research.txt", "r") as f:
-  prompt = f.read()
+def summary():
+  with open("summarise.txt", "r") as f:
+    prompt = f.read()
 
-response = "This is a generated answer."
+  with open("summarise.txt", "w") as f:
+    f.write()
 
-with open("research.txt", "w") as f:
-  f.write(response)
-
-with open("sumarise.txt", "a") as f:
-  f.write("Model run completed\n")
+  with open("sumarise.txt", "a") as f:
+    f.write("Model run completed\n")
+    
 
 # ---------------------
 # 15. Path Handling
