@@ -89,6 +89,24 @@ After that, load it in main.py file before you run the CLI.
 
 ---
 
+## How it Works
+
+- It uses `python-dotenv` to load your API keys from the `.env` file.
+- It uses `argparse` to read the command line options. 
+- It uses the OpenAI SDK to send your text to the model and print the result.
+- It uses the main API call using this function:
+  
+```python
+def ask_openai(client, model, prompt):
+  response = client.responses.create(
+    input = prompt,
+    model = model,
+  )
+  return response.output_text
+```
+
+---
+
 ## License
 
 This project is licensed under the MIT License.
