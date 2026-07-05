@@ -2,19 +2,17 @@ import argparse
 import sys
 from dataclasses import dataclass
 from typing import List
-import json
 from pathlib import Path
 from typing import Optional
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
 client = os.dotenv("OPENAI_API_KEY")
 
 parser = argparse.ArgumentParser(description="prompt")
-
 parser.add_argument("-v", "--verbose", action="store_true", help="Turn on verbose logging")
 parser.add_argument("-o", "--output", type=str, default="research.txt", help="Output file path")
-
 args = parser.parse_args()
 
 if args.verbose:
@@ -107,43 +105,29 @@ config = ModelConfig(
 
 @dataclass
 class Message: 
-  role: str
   timestamp: str
-  content: str = ""
-
-message1 = Message(
-  timestamp="This happened at 2026-06-17, 14:32:10",
-  role="user", 
-  content="What is this model?"
-)
-
-message2 = Message(
-  timestamp="This happened at 2026-06-18, 15:43:21",
-  role="assistant",
-  content="This is an AI Toolkit CLI"
-)
+  model: str = "gpt-3.5"
+  input: str = ""
 
 # ---------------------
 # Dictionary, List, and String Syntax
 # ---------------------
 
+model = os.getenv["gpt-3.5":"OPENAI_API_KEY"]
+tokens_used = os.dotenv("OPENAI_API_KEY")
+status = f"{model} has used {tokens_used} tokens so far."
+
 model_config = {
   "model": "gpt-3.5",
-  "temperature": "0.5",
+  "temperature": "0.",
   "max_tokens": 900
 }
 
 tools = [
-  {"tool": "load prompts from files"},
-  {"tool": "Run through an LLM Model"},
-  {"tool": "Save responses automatically"},
-  {"tool": "Keep History"}
+  {"tool": "Translate Texts"},
+  {"tool": "Analyse Sentiment"},
+  {"tool": "Summarise the Texts"}
 ]
-
-model = "gpt-3.5"
-tokens_used = 100
-
-status = f"model {model} has used {tokens_used} tokens so far"
 
 # ---------------------
 # 2. Type Hints
@@ -164,25 +148,26 @@ def user_prompt(client, model):
 # 5. Conditionals
 # ---------------------
 
-spam_probability = 0.70
-
-if spam_probability >= 0.70:
-  print("This email is spam")
-else: 
-  ("This email is not spam")
+def spam():
+  spam_probability = 0.70
+  if spam_probability >= 0.70:
+    print("This email is spam")
+  else: 
+    print("This email is not spam")
 
 # ---------------------
 # 6. Loops
 # ---------------------
 
-while True: 
-  message = input("You need: ")
+def loop():
+  while True: 
+    message = input("Do you want to exit? yes/no")
 
-  if message.lower() == "exit":
-    print("Bot: Goodbye!")
-    break
+    if message.lower() == "yes":
+      print("Goodbye!")
+      break
 
-  print("Bot: I received:", message)
+  print("Received Successfully!")
 
 # ---------------------
 # 7. Set Comprehensions
@@ -200,13 +185,11 @@ class LLM_Model:
     self.lr = config.get("lr", 0.001)
     self.activation = config.get("activation", "relu")
 
-model = LLM_Model(64, 128, 10, lr=0.001, activation="tanh")
-
 # ---------------------
 # 11. Exception Handling
 # ---------------------
 
-def api(client):
+def test_API(client):
   try:
     response = client.responses.create(
       model="gpt-3.5"
@@ -258,41 +241,24 @@ def summary():
 
   with open("sumarise.txt", "a") as f:
     f.write("Model run completed\n")
+  return prompt
     
 
 # ---------------------
 # 15. Path Handling
 # ---------------------
 
-data_path = Path("data") / "train.csv"
+def path_handling():
+  prompt_path = Path("prompts") / "summarise.txt"
+  with prompt_path.open("r") as f:
+    prompt = f.read()
 
-prompt_path = Path("prompts") / "sumarise.txt"
+  with prompt_path.open("w") as f:
+    f.write("Generated summary from this model.")
 
-with prompt_path.open("r") as f:
-  prompt = f.read()
-
-output_dir = Path("outputs")
-output_dir.mkdir(exist_ok=True)
-
-output_file = output_dir / "sumarise.txt"
-
-with output_file.open("w") as f:
-  f.write("Generated answer from this model.")
-
-# ---------------------
-# 16. JSON
-# ---------------------
-
-{
-  "model": "gpt-3.5",
-  "task": "Research Hubspot",
-  "priority": "medium",
-  "output_format": "summary"
-}
-
-{
-  "prompt": "...",
-  "model": "gpt-3.5",
-  "response": "...",
-  "timestamp": "2026-06-14"
-}
+def ask_openai(client, prompt, model=os.getenv("OPENAI_API_KEY")):
+  response = client.responses.create(
+    model="gpt-3.5",
+    input=""
+  )
+  return response.output_text
