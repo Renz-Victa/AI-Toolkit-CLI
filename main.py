@@ -1,107 +1,60 @@
 import argparse
 import sys
+import os
+
 from dataclasses import dataclass
 from typing import List
 from pathlib import Path
 from typing import Optional
 from dotenv import load_dotenv
-import os
+from openai import OpenAI
 
 load_dotenv()
 client = os.dotenv("OPENAI_API_KEY")
-
-parser = argparse.ArgumentParser(description="prompt")
-parser.add_argument("-v", "--verbose", action="store_true", help="Turn on verbose logging")
-parser.add_argument("-o", "--output", type=str, default="research.txt", help="Output file path")
-args = parser.parse_args()
-
-if args.verbose:
-  print(f"Verbose mode active. Saving results to: {args.output}")
-
-flag_active = "--flag" in sys.argv or "-f" in sys.argv
-print("Flag is on!" if flag_active else "Flag is off.")
 
 def greet(name: Optional[str]) -> str: 
   if name is None:
     return "Hello, Guest"
   return f"Hello, {name}"
 
-def train_model(data, model, *, epochs, learning_rate):
-  print(f"Training {model} for {epochs} epochs with lr={learning_rate}")
+def create_parser():
+  if args.file:
+    parser = argparse.ArgumentParser(
+      description="prompt"
+    )  
 
-train_model("dataset.csv", epochs=10, learning_rate=0.001)
-
-def build_optimizer(model, *, lr=0.001, weight_decay=0.0, beta1=0.9):
-  print("Optimizer configured")
-
-class Dataset:
-  def __init__(self, data):
-    self.data = data  
-
-  def predict(self, x):
-    return self.data
+  parser.add_argument(
+    "-v", 
+    "--verbose", 
+    action="store_true", 
+    help="Turn on verbose logging"
+    )
   
-model = Dataset(data=2)
-
-result = model.predict(5)
-print(result)
-
-class BaseModel:
-  def train(self):
-    print("Training the Model...")
+  parser.add_argument(
+    "-o", 
+    "--output", 
+    type=str, 
+    default="args.file", 
+    help="Output file path")
   
-  def predict(self, x):
-    print("Making a Prediction")
+  args = parser.parse_args()
 
-class NeuralNetwork(BaseModel):
-  def __init__(self):
-    print("Neural Network Initialised")
+  if args.verbose:
+    print(f"Verbose mode active. Saving results to: {args.output}")
+ 
+  flag_active = "--flag" in sys.argv or "-f" in sys.argv
+  print("Flag is on!" if flag_active else "Flag is off.")
+  
+  if not sys.stdin.isatty():
+    return sys.stdin.read()
+  print("Please provide text with --text, --file, or piped input.")
+  sys.exit(1)
 
-  def predict(self, x):
-    print("Deep learning prediction")
-
-model = NeuralNetwork()
-model.train()
-model.predict(10)
+  return parser
 
 # ---------------------
 # DataClass Syntax
 # ---------------------
-
-@dataclass
-class TrainingConfig:
-  learning_rate: float = 0.001
-  batch_size: int = 32
-  epochs: int = 10
-
-config = TrainingConfig(
-  learning_rate=0.001,
-  batch_size=32,
-  epochs=10
-)
-
-print(config.learning_rate)
-print(config.batch_size)
-
-@dataclass
-class ModelConfig:
-  model_name: str
-  max_tokens: int
-  temperature: float
-  hidden_size: int = 768
-  num_layers: int = 12
-  dropout: float = 0.1
-  vocab_size: int = 20000
-
-config = ModelConfig(
-  hidden_size=128,
-  num_layers=12,
-  dropout=0.1,
-  vocab_size=50000,
-  model_name="gpt-model",
-  max_tokens=1000,
-  temperature=0.5
-)
 
 @dataclass
 class Message: 
@@ -109,43 +62,37 @@ class Message:
   model: str = "gpt-3.5"
   input: str = ""
 
+# ---------------------------------------------------
+# Dictionary, List, String Syntax, Set Comprehension
+# ---------------------------------------------------
+
+def get_status():
+  model = os.getenv["gpt-3.5":"OPENAI_API_KEY"]
+  tokens_used = os.dotenv("OPENAI_API_KEY")
+  status = f"{model} has used {tokens_used} tokens so far."
+  unique_tools = {t["tool"] for t in tools}
+
+  model_config = {
+    "model": "gpt-3.5",
+    "temperature": "0.9",
+    "max_tokens": 900
+  }
+
+  tools = [
+    {"tool": "Translate Texts"},
+    {"tool": "Analyse Sentiment"},
+    {"tool": "Summarise the Texts"}
+  ]
+  return status, model_config, tools, unique_tools
+
 # ---------------------
-# Dictionary, List, and String Syntax
-# ---------------------
-
-model = os.getenv["gpt-3.5":"OPENAI_API_KEY"]
-tokens_used = os.dotenv("OPENAI_API_KEY")
-status = f"{model} has used {tokens_used} tokens so far."
-
-model_config = {
-  "model": "gpt-3.5",
-  "temperature": "0.",
-  "max_tokens": 900
-}
-
-tools = [
-  {"tool": "Translate Texts"},
-  {"tool": "Analyse Sentiment"},
-  {"tool": "Summarise the Texts"}
-]
-
-# ---------------------
-# 2. Type Hints
+# Type Hints
 # ---------------------
 
 features: list[str, float]
 
 # ---------------------
-# 4. Input from user
-# ---------------------
-
-def user_prompt(client, model):
-  user_prompt = input("Enter your question: ")
-  response = f"AI Response to: {user_prompt}"
-  print(response)
-
-# ---------------------
-# 5. Conditionals
+# Conditionals
 # ---------------------
 
 def spam():
@@ -156,7 +103,7 @@ def spam():
     print("This email is not spam")
 
 # ---------------------
-# 6. Loops
+# Loops
 # ---------------------
 
 def loop():
@@ -169,14 +116,9 @@ def loop():
 
   print("Received Successfully!")
 
-# ---------------------
-# 7. Set Comprehensions
-# ---------------------
-
-unique_tools = {t["tool"] for t in tools}
 
 # ---------------------
-# 9. *args and **kwargs
+# *args and **kwargs
 # ---------------------
 
 class LLM_Model:
@@ -186,19 +128,22 @@ class LLM_Model:
     self.activation = config.get("activation", "relu")
 
 # ---------------------
-# 11. Exception Handling
+# Exception Handling
 # ---------------------
 
-def test_API(client):
+def test_API(client, prompt, model=os.getenv("OPENAI_API_KEY")):
   try:
     response = client.responses.create(
-      model="gpt-3.5"
+      model=model,
+      input=prompt
     )
   
   except Exception as e:
     print(f"LLM API failed: {e}")
   except ConnectionError:
     print("Failed to connect to the API.")
+  sys.exit(1)
+  return response
 
 class RetrievalError(Exception):
   def retrieve_documents():
@@ -217,20 +162,32 @@ class RetrievalError(Exception):
       print("Request time out. Please try again later.")
     finally:
       print("Finished!")
+    sys.exit(1)
     return data
 
-def read_file(client):
-  try:
-    file = open("summarise.txt")
-    data = file.read()
+def read_text(args):
+  if args.text:
+    return args.text
+  
+  if args.file:
+    try:
+      with open(args.file, "r", encoding="utf-8") as file:
+        return file.read()
 
-  except FileNotFoundError:
-    print("File not found")
+    except FileNotFoundError:
+      print("File not found: {args.file}")
+      sys.exit(1)
     return data
+  
+  if not sys.stdin.isatty():
+    return sys.stdin
 
-# ---------------------
-# 14. File Reading and Writing
-# ---------------------
+  print("Please prvodie text with --text, --file, or piped input.")
+  sys.exit(1)
+
+# -------------------------------
+# File Reading and Writing
+# -------------------------------
 
 def summary():
   with open("summarise.txt", "r") as f:
@@ -245,7 +202,7 @@ def summary():
     
 
 # ---------------------
-# 15. Path Handling
+# Path Handling
 # ---------------------
 
 def path_handling():
@@ -256,9 +213,37 @@ def path_handling():
   with prompt_path.open("w") as f:
     f.write("Generated summary from this model.")
 
-def ask_openai(client, prompt, model=os.getenv("OPENAI_API_KEY")):
+# ---------------------
+# Input from user
+# ---------------------
+
+def ask_openai(client, instructions, user_prompt, model=os.getenv("OPENAI_API_KEY")):
   response = client.responses.create(
-    model="gpt-3.5",
-    input=""
+    model=model,
+    instructions=instructions,
+    input=user_prompt
   )
   return response.output_text
+
+def summarise(client, model, user_prompt):
+  instructions = (
+    "jdfksaj"
+    ""
+  )
+  return ask_openai(client, model, instructions, user_prompt)
+
+def translate(client, model, user_prompt, language):
+  instructions = (
+    f"Translate the user's text from English to {language}."
+    f"Translate the user's text from {language} to English."
+  )
+  return ask_openai(client, model, instructions, user_prompt)
+
+def analyse_sentiment(client, model, user_prompt):
+  instructions = (
+    "Analyse the sentiment of the user's text. Say whether it is Positive, Negative, Neutral, or Mixed. Then explain why in 1 or 2 simple sentences."
+  )
+  return ask_openai(client, model, instructions, user_prompt)
+
+if __name__ == "__main__":
+  main()
