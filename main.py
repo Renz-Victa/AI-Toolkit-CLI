@@ -18,53 +18,54 @@ def greet(name: Optional[str]) -> str:
   return f"Hello, {name}"
 
 def create_parser():
-  if args.file:
-    parser = argparse.ArgumentParser(
-      description="prompt"
+  parser = argparse.ArgumentParser(
+      description="An AI Toolkit CLI using the OPENAI API."
     )  
 
   parser.add_argument(
-    "-v", 
-    "--verbose", 
+    "task", 
+    choices=["summarise", "translate", "sentiment"],
+    type=str,
     action="store_true", 
-    help="Turn on verbose logging"
+    help="Choose what you want the AI to do."
     )
   
   parser.add_argument(
-    "-o", 
-    "--output", 
+    "-t"
+    "--text",  
     type=str, 
+    default="args.text", 
+    help="Text you want to send to the AI."
+    )
+  
+  parser.add_argument(
+    "-f"
+    "--file",  
     default="args.file", 
-    help="Output file path")
+    help="File you want to send to the AI."
+    )
   
-  args = parser.parse_args()
-
-  if args.verbose:
-    print(f"Verbose mode active. Saving results to: {args.output}")
- 
-  flag_active = "--flag" in sys.argv or "-f" in sys.argv
-  print("Flag is on!" if flag_active else "Flag is off.")
+  parser.add_argument(
+    "-l"
+    "--language",  
+    default="args.language", 
+    help="Language for translation."
+    )
   
-  if not sys.stdin.isatty():
-    return sys.stdin.read()
-  print("Please provide text with --text, --file, or piped input.")
-  sys.exit(1)
-
+  parser.add_argument(
+    "-m"
+    "--model",  
+    default="args.model", 
+    help="Model you want to use."
+    )
+    
   return parser
-
-# ---------------------
-# DataClass Syntax
-# ---------------------
 
 @dataclass
 class Message: 
   timestamp: str
-  model: str = "gpt-3.5"
   input: str = ""
-
-# ---------------------------------------------------
-# Dictionary, List, String Syntax, Set Comprehension
-# ---------------------------------------------------
+  model: str = "gpt-3.5"
 
 def get_status():
   model = os.getenv["gpt-3.5":"OPENAI_API_KEY"]
@@ -85,26 +86,12 @@ def get_status():
   ]
   return status, model_config, tools, unique_tools
 
-# ---------------------
-# Type Hints
-# ---------------------
-
-features: list[str, float]
-
-# ---------------------
-# Conditionals
-# ---------------------
-
 def spam():
   spam_probability = 0.70
   if spam_probability >= 0.70:
     print("This email is spam")
   else: 
     print("This email is not spam")
-
-# ---------------------
-# Loops
-# ---------------------
 
 def loop():
   while True: 
@@ -115,21 +102,6 @@ def loop():
       break
 
   print("Received Successfully!")
-
-
-# ---------------------
-# *args and **kwargs
-# ---------------------
-
-class LLM_Model:
-  def __init__(self, *layers, **config):
-    self.layers = layers
-    self.lr = config.get("lr", 0.001)
-    self.activation = config.get("activation", "relu")
-
-# ---------------------
-# Exception Handling
-# ---------------------
 
 def test_API(client, prompt, model=os.getenv("OPENAI_API_KEY")):
   try:
@@ -185,10 +157,6 @@ def read_text(args):
   print("Please prvodie text with --text, --file, or piped input.")
   sys.exit(1)
 
-# -------------------------------
-# File Reading and Writing
-# -------------------------------
-
 def summary():
   with open("summarise.txt", "r") as f:
     prompt = f.read()
@@ -199,11 +167,6 @@ def summary():
   with open("sumarise.txt", "a") as f:
     f.write("Model run completed\n")
   return prompt
-    
-
-# ---------------------
-# Path Handling
-# ---------------------
 
 def path_handling():
   prompt_path = Path("prompts") / "summarise.txt"
@@ -244,6 +207,31 @@ def analyse_sentiment(client, model, user_prompt):
     "Analyse the sentiment of the user's text. Say whether it is Positive, Negative, Neutral, or Mixed. Then explain why in 1 or 2 simple sentences."
   )
   return ask_openai(client, model, instructions, user_prompt)
+
+def main():
+  parser = create_parser()
+  args = parser.parse_args()
+  client = test_API()
+  text = read_text(args).strip()
+
+  if args.verbose:
+    print(f"Verbose mode active. Saving results to: {args.output}")
+ 
+  flag_active = "--flag" in sys.argv or "-f" in sys.argv
+  print("Flag is on!" if flag_active else "Flag is off.")
+
+  if not text:
+    print("This text is empty. Please try again.")
+    sys.exit(1)
+
+  while args.task == "summarise":
+    result = summarise(client, args.model, text)
+  while args.task == "translate":
+    result = translate(client, args.model, text, args.language)
+  else:
+    result = analyse_sentiment(client, text, args.model)
+
+  print(result)
 
 if __name__ == "__main__":
   main()
